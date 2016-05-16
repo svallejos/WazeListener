@@ -23,14 +23,54 @@ import facebook4j.internal.org.json.JSONArray;
 import facebook4j.internal.org.json.JSONException;
 import facebook4j.internal.org.json.JSONObject;
 
-public class WazeListener
-implements Runnable {
+public class WazeListener implements Runnable {
+	
+	// Variables
+	
     private static final String USER_AGENT = "Mozilla/5.0";
     private HashMap<String, JSONObject> events = new HashMap<String, JSONObject>();
     private String path;
     private boolean active;
     private long tiempo;
 
+    // Constructors
+    
+    public WazeListener(String path, long tiempo) {
+        this.setActive(true);
+        this.setPath(path);
+        this.tiempo = tiempo * 1000;
+    }
+    
+    // Getters and Setters
+    
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    public void setPath(String path) {
+        this.path = path;
+        try {
+            String pathfile = String.valueOf(path) + File.separator + "Waze_" + new SimpleDateFormat("dd-MM-yyyy").format(new Date()) + ".json";
+            String content = this.readFile(pathfile, StandardCharsets.UTF_8);
+            JSONArray alerts_jsonarray = new JSONArray(content);
+            System.out.println("[INFO] " + alerts_jsonarray.length() + " alertas leidas del archivo ya existente");
+            int i = 0;
+            while (i < alerts_jsonarray.length()) {
+                JSONObject alert_json = alerts_jsonarray.getJSONObject(i);
+                String id = alert_json.getString("id");
+                if (id != null) {
+                    this.events.put(id, alert_json);
+                }
+                ++i;
+            }
+        }
+        catch (JSONException | IOException e) {
+            System.out.println("[INFO] El archivo " + e.getMessage() + " no se pudo leer o no existia");
+        }
+    }
+    
+    // Methods
+    
     private String sendGet(String url) throws Exception {
         String inputLine;
         URL obj = new URL(url);
@@ -97,37 +137,9 @@ implements Runnable {
         }
     }
 
-    public WazeListener(String path, long tiempo) {
-        this.setActive(true);
-        this.setPath(path);
-        this.tiempo = tiempo * 1000;
-    }
+   
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-        try {
-            String pathfile = String.valueOf(path) + File.separator + "Waze_" + new SimpleDateFormat("dd-MM-yyyy").format(new Date()) + ".json";
-            String content = this.readFile(pathfile, StandardCharsets.UTF_8);
-            JSONArray alerts_jsonarray = new JSONArray(content);
-            System.out.println("[INFO] " + alerts_jsonarray.length() + " alertas leidas del archivo ya existente");
-            int i = 0;
-            while (i < alerts_jsonarray.length()) {
-                JSONObject alert_json = alerts_jsonarray.getJSONObject(i);
-                String id = alert_json.getString("id");
-                if (id != null) {
-                    this.events.put(id, alert_json);
-                }
-                ++i;
-            }
-        }
-        catch (JSONException | IOException e) {
-            System.out.println("[INFO] El archivo " + e.getMessage() + " no se pudo leer o no existia");
-        }
-    }
+   
 
     private String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path, new String[0]));
