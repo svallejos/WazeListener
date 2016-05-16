@@ -1,3 +1,4 @@
+package app;
 /*
  * Decompiled with CFR 0_114.
  */
