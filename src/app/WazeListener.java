@@ -76,7 +76,10 @@ public class WazeListener implements Runnable {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection)obj.openConnection();
         con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Referer", "https://www.waze.com/es-419/livemap");
+        con.setRequestProperty("Host", "www.waze.com");
+        
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.ISO_8859_1));
         StringBuffer response = new StringBuffer();
         while ((inputLine = in.readLine()) != null) {
