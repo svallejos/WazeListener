@@ -1,5 +1,6 @@
 package app;
 
+import java.io.File;
 
 public class Main {
 	
@@ -11,7 +12,7 @@ public class Main {
 			tiempo = Long.parseLong(args[0]);
 		}
 		
-		WazeListener wazeListener = new WazeListener(".\\resources", tiempo);
+		WazeListener wazeListener = new WazeListener("." + File.separator + "resources", tiempo);
 		Thread thread = new Thread(wazeListener);
 		thread.start();
 	}
